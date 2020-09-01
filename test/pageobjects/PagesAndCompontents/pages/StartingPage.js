@@ -6,7 +6,7 @@ class StartingPage extends BasePage {
         this.pageHeader = '.page-header';
         this.cathegories = '.popular-body>.category';
         this.homeCards = '.home-card';
-
     }
-
 }
+
+module.exports = StartingPage;

@@ -17,7 +17,7 @@ exports.config = {
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
     specs: [
-        './test/specs/**/*.js'
+        './test/features/**/*.feature'
     ],
     // Patterns to exclude.
     exclude: [
@@ -116,11 +116,12 @@ exports.config = {
     // before running any tests.
     framework: 'cucumber',
     cucumberOpts:{
-        timeout: 60000,
+        timeout: 30000,
         backtrace: true,
         strict: true,
         retry: 0,
-        ignoreUndefinedDefinitions: true
+        ignoreUndefinedDefinitions: true,
+        require: ["./test/step_definitions/actions.js"]
     },
     //
     // The number of times to retry the entire specfile when it fails as a whole

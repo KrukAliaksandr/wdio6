@@ -21,6 +21,7 @@
   "homepage": "https://github.com/KrukAliaksandr/wdio6#readme",
   "dependencies": {
     "@types/cucumber": "^6.0.1",
+    "cucumber": "^6.0.5",
     "wdio": "^4.0.0"
   },
   "devDependencies": {

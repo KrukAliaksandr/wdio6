@@ -3,7 +3,8 @@ class TopNavBar {
         this.loginButton = "[applogevent=\"Login\"]";
         this.documentationButton = "[applogevent=\"Documentation\"]";
         this.helpButton = "[applogevent=\"Help\"]";
-        this.helpButton = "[applogevent=\"About\"]";
+        this.aboutButton = "[applogevent=\"About\"]";
+        this.userDropdown = "#dropdownMenu2";
     }
 
     async clickLoginBtn () {

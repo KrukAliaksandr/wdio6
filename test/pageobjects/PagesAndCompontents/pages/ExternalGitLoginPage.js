@@ -2,13 +2,14 @@ class ExternalGitLoginPage {
     constructor() {
         this.name = "[name='login']";
         this.password = "[name='password']";
-        this.signin = "[name='commit']";
+        this.signInBtn = "[name='commit']";
     }
 
     async logIn(username, password) {
-        await $(this.name).setValue(username)
-        await $(this.password).setValue(password)
-        await $(this.signin).click();
+
+        await (await $(this.name)).setValue(username);
+        await (await $(this.password)).setValue(password);
+        await (await $(this.signInBtn)).click();
     }
 }
 
