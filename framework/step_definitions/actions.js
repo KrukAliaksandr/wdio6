@@ -4,6 +4,7 @@ const LoginPage = require("../pageobjects/PagesAndCompontents/pages/LoginPage");
 const ExternalGitLoginPage = require("../pageobjects/PagesAndCompontents/pages/ExternalGitLoginPage");
 
 When(/^I open "([^"]+)" url/, async url => {
+    this.info(`navigate to url`);
     return browser.url(url);
 });
 

@@ -11,13 +11,13 @@ exports.config = {
     // ==================
     // Specify Test Files
     // ==================
-    // Define which test specs should run. The pattern is relative to the directory
+    // Define which framework specs should run. The pattern is relative to the directory
     // from which `wdio` was called. Notice that, if you are calling `wdio` from an
     // NPM script (see https://docs.npmjs.com/cli/run-script) then the current working
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
     specs: [
-        './test/features/**/*.feature'
+        './framework/features/**/*.feature'
     ],
     // Patterns to exclude.
     exclude: [
@@ -28,7 +28,7 @@ exports.config = {
     // Capabilities
     // ============
     // Define your capabilities here. WebdriverIO can run multiple capabilities at the same
-    // time. Depending on the number of capabilities, WebdriverIO launches several test
+    // time. Depending on the number of capabilities, WebdriverIO launches several framework
     // sessions. Within your capabilities you can overwrite the spec and exclude options in
     // order to group specific specs to a specific capability.
     //
@@ -37,9 +37,9 @@ exports.config = {
     // set maxInstances to 1; wdio will spawn 3 processes. Therefore, if you have 10 spec
     // files and you set maxInstances to 10, all spec files will get tested at the same time
     // and 30 processes will get spawned. The property handles how many capabilities
-    // from the same test should run tests.
+    // from the same framework should run tests.
     //
-    maxInstances: 10,
+    maxInstances: 3,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -50,10 +50,27 @@ exports.config = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 5,
+        maxInstances: 4,
         //
         browserName: 'chrome',
-        acceptInsecureCerts: true
+        'goog:chromeOptions': {
+            args: [
+                '--start-maximized',
+                'disable-extensions',
+                '--disable-infobars'
+            ],
+            prefs: {
+                'credentials_enable_service': false,
+                'profile': {
+                    'password_manager_enabled': false
+                }
+            }
+        },
+
+        'moz:firefoxOptions': {
+            args: ['-safe-mode', '-headless']
+        },
+    acceptInsecureCerts: true
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
@@ -104,8 +121,8 @@ exports.config = {
     //
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
-    // your test setup with almost no effort. Unlike plugins, they don't add new
-    // commands. Instead, they hook themselves up into the test process.
+    // your framework setup with almost no effort. Unlike plugins, they don't add new
+    // commands. Instead, they hook themselves up into the framework process.
     services: ['chromedriver'],
 
     // Framework you want to run your specs with.
@@ -117,11 +134,17 @@ exports.config = {
     framework: 'cucumber',
     cucumberOpts:{
         timeout: 30000,
-        backtrace: true,
-        strict: true,
+        dryRun: false,
+        backtrace: false,
+        strict: false,
         retry: 0,
-        ignoreUndefinedDefinitions: true,
-        require: ["./test/step_definitions/actions.js"]
+        failFast: false,
+        snippets: true,
+        source: true,
+        profile: [],
+        format: [],
+        ignoreUndefinedDefinitions: false,
+        require: ["./framework/step_definitions/**/*.js", "./framework/support/*.js"]
     },
     //
     // The number of times to retry the entire specfile when it fails as a whole
@@ -146,7 +169,7 @@ exports.config = {
     // =====
     // Hooks
     // =====
-    // WebdriverIO provides several hooks you can use to interfere with the test process in order to enhance
+    // WebdriverIO provides several hooks you can use to interfere with the framework process in order to enhance
     // it and to build services around it. You can either apply a single function or an array of
     // methods to it. If one of them returns with a promise, WebdriverIO will wait until that promise got
     // resolved to continue.
@@ -169,7 +192,7 @@ exports.config = {
     // onWorkerStart: function (cid, caps, specs, args, execArgv) {
     // },
     /**
-     * Gets executed just before initialising the webdriver session and test framework. It allows you
+     * Gets executed just before initialising the webdriver session and framework framework. It allows you
      * to manipulate configurations depending on the capability or spec.
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
@@ -178,7 +201,7 @@ exports.config = {
     // beforeSession: function (config, capabilities, specs) {
     // },
     /**
-     * Gets executed before test execution begins. At this point you can access to all global
+     * Gets executed before framework execution begins. At this point you can access to all global
      * variables like `browser`. It is the perfect place to define custom commands.
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs List of spec file paths that are to be run
@@ -199,26 +222,26 @@ exports.config = {
     // beforeSuite: function (suite) {
     // },
     /**
-     * Function to be executed before a test (in Mocha/Jasmine) starts.
+     * Function to be executed before a framework (in Mocha/Jasmine) starts.
      */
-    // beforeTest: function (test, context) {
+    // beforeTest: function (framework, context) {
     // },
     /**
      * Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
      * beforeEach in Mocha)
      */
-    // beforeHook: function (test, context) {
+    // beforeHook: function (framework, context) {
     // },
     /**
      * Hook that gets executed _after_ a hook within the suite starts (e.g. runs after calling
      * afterEach in Mocha)
      */
-    // afterHook: function (test, context, { error, result, duration, passed, retries }) {
+    // afterHook: function (framework, context, { error, result, duration, passed, retries }) {
     // },
     /**
-     * Function to be executed after a test (in Mocha/Jasmine).
+     * Function to be executed after a framework (in Mocha/Jasmine).
      */
-    // afterTest: function(test, context, { error, result, duration, passed, retries }) {
+    // afterTest: function(framework, context, { error, result, duration, passed, retries }) {
     // },
 
 
@@ -239,8 +262,8 @@ exports.config = {
     // },
     /**
      * Gets executed after all tests are done. You still have access to all global variables from
-     * the test.
-     * @param {Number} result 0 - test pass, 1 - test fail
+     * the framework.
+     * @param {Number} result 0 - framework pass, 1 - framework fail
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs List of spec file paths that ran
      */
@@ -256,11 +279,11 @@ exports.config = {
     // },
     /**
      * Gets executed after all workers got shut down and the process is about to exit. An error
-     * thrown in the onComplete hook will result in the test run failing.
+     * thrown in the onComplete hook will result in the framework run failing.
      * @param {Object} exitCode 0 - success, 1 - fail
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
-     * @param {<Object>} results object containing test results
+     * @param {<Object>} results object containing framework results
      */
     // onComplete: function(exitCode, config, capabilities, results) {
     // },

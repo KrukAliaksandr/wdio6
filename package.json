@@ -4,7 +4,7 @@
   "description": "simple wdio test automation framework",
   "main": "index.js",
   "scripts": {
-    "test": "-test"
+    "test": "npx wdio config/wdio.conf.js"
   },
   "repository": {
     "type": "git",
@@ -21,8 +21,9 @@
   "homepage": "https://github.com/KrukAliaksandr/wdio6#readme",
   "dependencies": {
     "@types/cucumber": "^6.0.1",
-    "cucumber": "^6.0.5",
-    "wdio": "^4.0.0"
+    "wdio": "^4.0.0",
+    "winston": "^3.3.3",
+    "yargs": "^15.4.1"
   },
   "devDependencies": {
     "@wdio/cli": "^6.4.4",
@@ -32,6 +33,7 @@
     "@wdio/spec-reporter": "^6.4.0",
     "@wdio/sync": "^6.4.0",
     "chromedriver": "^85.0.0",
+    "cucumber": "^6.0.5",
     "wdio-chromedriver-service": "^6.0.3"
   }
 }
