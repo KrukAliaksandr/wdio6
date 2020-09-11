@@ -1,3 +1,7 @@
+const yargs = require("yargs").argv
+const {ensureDir} = require("fs-extra");
+const {generate} = require('multiple-cucumber-html-reporter');
+
 exports.config = {
     //
     // ====================
@@ -66,11 +70,6 @@ exports.config = {
                 }
             }
         },
-
-        'moz:firefoxOptions': {
-            args: ['-safe-mode', '-headless']
-        },
-    acceptInsecureCerts: true
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
@@ -114,16 +113,27 @@ exports.config = {
     //
     // Default timeout in milliseconds for request
     // if browser driver or grid doesn't send response
-    connectionRetryTimeout: 120000,
+    connectionRetryTimeout: 90000,
     //
     // Default request retries count
-    connectionRetryCount: 3,
+    connectionRetryCount: 0,
     //
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
     // your framework setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the framework process.
-    services: ['chromedriver'],
+    services: [['selenium-standalone', {
+        installArgs: {
+            drivers: {
+                chrome: {version: '85.0.4183.83'}
+            }
+        },
+        args: {
+            drivers: {
+                chrome: {version: '85.0.4183.83'}
+            }
+        },
+    }]],
 
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
@@ -132,7 +142,7 @@ exports.config = {
     // Make sure you have the wdio adapter package for the specific framework installed
     // before running any tests.
     framework: 'cucumber',
-    cucumberOpts:{
+    cucumberOpts: {
         timeout: 30000,
         dryRun: false,
         backtrace: false,
@@ -144,7 +154,8 @@ exports.config = {
         profile: [],
         format: [],
         ignoreUndefinedDefinitions: false,
-        require: ["./framework/step_definitions/**/*.js", "./framework/support/*.js"]
+        tagExpression: yargs.tags || "@MY",
+        require: ["./framework/step_definitions/**/*.js", "./support/*.js"]
     },
     //
     // The number of times to retry the entire specfile when it fails as a whole
@@ -156,15 +167,10 @@ exports.config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter.html
-    reporters: ['spec'],
-
+    reporters: [['cucumberjs-json', {jsonFolder: 'reports/json/'}]],
     //
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
-    mochaOpts: {
-        ui: 'bdd',
-        timeout: 60000
-    },
     //
     // =====
     // Hooks
@@ -178,8 +184,9 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: function (config, capabilities) {
-    // },
+    onPrepare: async function (config, capabilities) {
+        await ensureDir('./reports');
+    },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -206,8 +213,10 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs List of spec file paths that are to be run
      */
-    // before: function (capabilities, specs) {
-    // },
+    before: async function (capabilities, specs) {
+        const {expect} = require('chai');
+        global.expect = expect;
+    },
     /**
      * Runs before a WebdriverIO command gets executed.
      * @param {String} commandName hook command name
@@ -267,8 +276,9 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs List of spec file paths that ran
      */
-    // after: function (result, capabilities, specs) {
-    // },
+    after: async function (result, capabilities, specs) {
+        await browser.closeWindow();
+    },
     /**
      * Gets executed right after terminating the webdriver session.
      * @param {Object} config wdio configuration object
@@ -285,13 +295,17 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing framework results
      */
-    // onComplete: function(exitCode, config, capabilities, results) {
-    // },
+    onComplete: function (exitCode, config, capabilities, results) {
+        generate({
+            jsonDir: 'reports/json/',
+            reportPath: 'reports/report/',
+        });
+    },
     /**
-    * Gets executed when a refresh happens.
-    * @param {String} oldSessionId session ID of the old session
-    * @param {String} newSessionId session ID of the new session
-    */
+     * Gets executed when a refresh happens.
+     * @param {String} oldSessionId session ID of the old session
+     * @param {String} newSessionId session ID of the new session
+     */
     //onReload: function(oldSessionId, newSessionId) {
     //}
 }
